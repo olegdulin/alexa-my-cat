@@ -1,0 +1,16 @@
+{
+  "intents": [
+    {
+      "intent": "CatFactIntent"
+    },
+    {
+      "intent": "JustFedIntent"
+    },
+    {
+      "intent": "LastFedIntent"
+    },
+    {
+      "intent": "AMAZON.HelpIntent"
+    }
+  ]
+}

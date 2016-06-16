@@ -1,0 +1,22 @@
+CatFactIntent tell me a cat fact
+CatFactIntent a cat fact
+CatFactIntent tell me a fact about cats
+CatFactIntent a fact about cats
+CatFactIntent something interesting about cats
+CatFactIntent something I should know about cats
+CatFactIntent something interesting
+CatFactIntent something I should know
+
+JustFedIntent i fed her
+JustFedIntent i fed him
+JustFedIntent i just fed her
+JustFedIntent i just fed him
+
+LastFedIntent when was he last fed
+LastFedIntent when was she last fed
+LastFedIntent when did I feed her last
+LastFedIntent when did I feed him last
+LastFedIntent did I feed her
+LastFedIntent did I feed him
+LastFedIntent has he been fed
+LastFedIntent has she been fed
