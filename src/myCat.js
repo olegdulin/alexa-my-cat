@@ -71,12 +71,12 @@ var lastFed = function(userId, callback) {
                     Bucket: bucket,
                     Key: userId + "/default/food.json"
                 },
-                function(err, data) {
+                function(err, s3data) {
                     console.log(JSON.stringify(err));
                     if (!err) {
-                        if (data!=null) {
-                            if (data.Body!=null) {
-                                callback(null, JSON.parse(data.Body.toString()));
+                        if (s3data!=null) {
+                            if (s3data.Body!=null) {
+                                callback(null, JSON.parse(s3data.Body.toString()));
                             }
                         }
                         else
@@ -92,7 +92,7 @@ var lastFed = function(userId, callback) {
                         else
                         {
 
-                            callback(err, data);
+                            callback(err, null);
                         }
 
                     }

@@ -11,12 +11,10 @@ JustFedIntent i fed her
 JustFedIntent i fed him
 JustFedIntent i just fed her
 JustFedIntent i just fed him
+JustFedIntent she has been fed
+JustFedIntent he has been fed
 
-LastFedIntent when was he last fed
-LastFedIntent when was she last fed
-LastFedIntent when did I feed her last
-LastFedIntent when did I feed him last
-LastFedIntent did I feed her
-LastFedIntent did I feed him
-LastFedIntent has he been fed
-LastFedIntent has she been fed
+LastFedIntent when I fed her last
+LastFedIntent when I fed him last
+LastFedIntent if I should feed him
+LastFedIntent if I should feed her
