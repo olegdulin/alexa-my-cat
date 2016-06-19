@@ -32,8 +32,16 @@ MyCatSkill.prototype.eventHandlers.onSessionStarted = function (sessionStartedRe
 };
 
 MyCatSkill.prototype.eventHandlers.onLaunch = function (launchRequest, session, response) {
-    console.log("MyCatSkill onLaunch requestId: " + launchRequest.requestId + ", sessionId: " + session.sessionId);
-    response.tell(fortune.fortune());
+    console.log("MyCatSkill onLaunch requestId: " + JSON.stringify(launchRequest));
+
+    myCat.lastFed(session.user.userId, function(err, data) {
+        if (data.lastFed==0) {
+            doFirstTime(launchRequest, session, response);
+        }
+        else {
+           lastFedIntent(session, response);
+        }
+    });
 };
 
 MyCatSkill.prototype.eventHandlers.onSessionEnded = function (sessionEndedRequest, session) {
@@ -42,6 +50,38 @@ MyCatSkill.prototype.eventHandlers.onSessionEnded = function (sessionEndedReques
     // any cleanup logic goes here
 };
 
+const HELP_SPEECH = "I can help you take better care of your cat. " +
+    "You can tell me that you fed your cat, ask me if your cat has been fed, or ask me for a fun fact.";
+
+function doFirstTime(launchRequest, session, response) {
+    response.tell(HELP_SPEECH);
+}
+
+function lastFedIntent(session, response) {
+    myCat.lastFed(session.user.userId, function (err, data) {
+        if (data.lastFed == 0) {
+            response.tellWithCard("I do not rememeber you feeding your cat", "My Cat", "I do not rememeber you feeding your cat");
+        }
+        else {
+            var timeNow = new Date().getTime();
+            var difference = timeNow - data.lastFed;
+            var minutes = Math.floor(difference / 1000 / 60);
+            var hours = Math.floor(difference / 1000 / 60 / 60);
+            if (hours == 0) {
+                response.tellWithCard("Your cat has been fed in the past hour", "My Cat", "Your cat has been fed in the past hour");
+            }
+            else if (hours > 4) {
+                response.tellWithCard("Your cat has been fed " + hours + " hours ago and it might be ready for a snack.", "My Cat",
+                    "Your cat has been fed " + hours + " hours ago and it might be ready for a snack.");
+            }
+            else {
+                response.tellWithCard("Your cat has been fed less than four hours ago.", "My Cat",
+                    "Your cat has been fed less than four hours ago.");
+            }
+
+        }
+    });
+}
 MyCatSkill.prototype.intentHandlers = {
     // register custom intent handlers
     "CatFactIntent": function (intent, session, response) {
@@ -52,38 +92,14 @@ MyCatSkill.prototype.intentHandlers = {
     },
     "JustFedIntent" : function(intent, session, response) {
         myCat.rememberFed(session.user.userId, new Date().getTime(), function() {
-            response.tellWithCard("Yes, you did feed your cat, but that won't stop it from " +
-                "trying to convince you otherwise!", "My Cat", "Remember not to overfeed your cat!");
+            response.tellWithCard("Noted. Just remember that your cat may try to convince you otherwise. Do not overfeed your pet!", "My Cat", "Remember not to overfeed your cat!");
         } );
     },
     "LastFedIntent" : function(intent, session, response) {
-        myCat.lastFed(session.user.userId, function(err, data) {
-            if (data.lastFed==0) {
-                response.tellWithCard("I do not rememeber you feeding your cat", "My Cat", "I do not rememeber you feeding your cat");
-            }
-            else {
-                var timeNow=new Date().getTime();
-                var difference=timeNow-data.lastFed;
-                var minutes=Math.floor(difference/1000/60);
-                var hours=Math.floor(difference/1000/60/60);
-                if (hours==0) {
-                    response.tellWithCard("Your cat has been fed in the past hour", "My Cat", "Your cat has been fed in the past hour");
-                }
-                else if (hours>4) {
-                    response.tellWithCard("Your cat has been fed "+hours+" hours ago and it might be ready for a snack.", "My Cat",
-                        "Your cat has been fed "+hours+" hours ago and it might be ready for a snack.");
-                }
-                else {
-                    response.tellWithCard("Your cat has been fed less than four hours ago.", "My Cat",
-                        "Your cat has been fed less than four hours ago.");
-                }
-
-            }
-        });
+        lastFedIntent(session, response);
     },
     "AMAZON.HelpIntent": function (intent, session, response) {
-        response.tell("I help you track your cat's feeding times and with things you should know about your cat. You can tell me when you fed your cat, " +
-            "ask me when your cat was fed last, and ask me for a fun cat fact!")
+        doFirstTime(null, session, response);
     }
 };
 

@@ -72,6 +72,7 @@ var lastFed = function(userId, callback) {
                     Key: userId + "/default/food.json"
                 },
                 function(err, data) {
+                    console.log(JSON.stringify(err));
                     if (!err) {
                         if (data!=null) {
                             if (data.Body!=null) {
@@ -90,6 +91,7 @@ var lastFed = function(userId, callback) {
                         }
                         else
                         {
+
                             callback(err, data);
                         }
 
