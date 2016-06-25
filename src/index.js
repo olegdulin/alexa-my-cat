@@ -33,21 +33,16 @@ MyCatSkill.prototype.eventHandlers.onSessionStarted = function (sessionStartedRe
 var fedMyCatResponse = [
     "Noted. Just remember that your cat may try to convince you otherwise. Do not overfeed your pet!",
     "Thanks for letting me know, I made a note of the feeding time. Remember not to overfeed your pet!",
-    "I recorded the feeding time, thank you. Don't overfeed your cat!"
+    "I recorded the feeding time. Don't overfeed your cat!"
 
 ]
 
 MyCatSkill.prototype.eventHandlers.onLaunch = function (launchRequest, session, response) {
     console.log("MyCatSkill onLaunch requestId: " + JSON.stringify(launchRequest));
+    session.attributes.interactive = true;
+    tellOrAsk(HELP_SPEECH, response, session);
 
-    myCat.lastFed(session.user.userId, function (err, data) {
-        if (data.lastFed == 0) {
-            doFirstTime(launchRequest, session, response);
-        }
-        else {
-            lastFedIntent(session, response);
-        }
-    });
+
 };
 
 MyCatSkill.prototype.eventHandlers.onSessionEnded = function (sessionEndedRequest, session) {
@@ -56,11 +51,23 @@ MyCatSkill.prototype.eventHandlers.onSessionEnded = function (sessionEndedReques
     // any cleanup logic goes here
 };
 
-const HELP_SPEECH = "I can help you take better care of your cat. " +
-    "You can tell me that you fed your cat, ask me if your cat has been fed, or ask me for a fun fact.";
+const PROMPT_SPEECH =  "You can tell me that you fed your cat, ask me if your cat has been fed, or ask me for a fun fact.";
+const HELP_SPEECH = "I can help you take better care of your cat. " + PROMPT_SPEECH;
+
+
+function tellOrAsk(speech, response, session) {
+    if (session.attributes.interactive) {
+        var speechOutput = speech + ". " + ( session.new ? "" : "Is there something else I can help you with ?");
+        session.attributes.speechReplay = speech;
+        response.ask(speechOutput, PROMPT_SPEECH); //TODO
+    }
+    else {
+        response.tell(speech);
+    }
+}
 
 function doFirstTime(launchRequest, session, response) {
-    response.tell(HELP_SPEECH);
+    tellOrAsk(HELP_SPEECH, response, session);
 }
 
 function feedingTimeHoursAgo(data) {
@@ -72,20 +79,20 @@ function feedingTimeHoursAgo(data) {
 function lastFedIntent(session, response) {
     myCat.lastFed(session.user.userId, function (err, data) {
         if (data.lastFed == 0) {
-            response.tellWithCard("I do not rememeber you feeding your cat", "My Cat", "I do not rememeber you feeding your cat");
+            tellOrAsk("I do not rememeber you feeding your cat", response, session);
         }
         else {
             var hours = feedingTimeHoursAgo(data);
             if (hours == 0) {
-                response.tellWithCard("Your cat has been fed in the past hour", "My Cat", "Your cat has been fed in the past hour");
+                tellOrAsk("Your cat has been fed in the past hour", response, session);
             }
             else if (hours > 4) {
-                response.tellWithCard("Your cat has been fed " + hours + " hours ago and it might be ready for a snack.", "My Cat",
-                    "Your cat has been fed " + hours + " hours ago and it might be ready for a snack.");
+                tellOrAsk("Your cat has been fed " + hours + " hours ago and it might be ready for a snack.", "My Cat",
+                    "Your cat has been fed " + hours + " hours ago and it might be ready for a snack.", response, session);
             }
             else {
-                response.tellWithCard("Your cat has been fed less than four hours ago.", "My Cat",
-                    "Your cat has been fed less than four hours ago.");
+                tellOrAsk("Your cat has been fed less than four hours ago.", "My Cat",
+                    "Your cat has been fed less than four hours ago.", response, session);
             }
 
         }
@@ -95,7 +102,7 @@ MyCatSkill.prototype.intentHandlers = {
     // register custom intent handlers
     "CatFactIntent": function (intent, session, response) {
         myCat.randomFact(function (fact) {
-            response.tellWithCard(fact.facts[0], "My Cat", fact.facts[0]);
+            tellOrAsk(fact.facts[0], response, session);
         });
 
     },
@@ -103,11 +110,12 @@ MyCatSkill.prototype.intentHandlers = {
         myCat.lastFed(session.user.userId, function (err, data) {
             var hours = feedingTimeHoursAgo(data);
             if (hours < 1) {
-                response.tell("You already fed your cat less than an hour ago. You shouldn't overfeed your pet");
+                tellOrAsk("You already fed your cat less than an hour ago. You shouldn't overfeed your pet", response, session);
             }
             else {
                 myCat.rememberFed(session.user.userId, new Date().getTime(), function () {
-                    response.tellWithCard("Noted. Just remember that your cat may try to convince you otherwise. Do not overfeed your pet!", "My Cat", "Remember not to overfeed your cat!");
+                    var r=Math.floor(Math.random()*fedMyCatResponse.length);
+                    tellOrAsk(fedMyCatResponse[r], response, session);
                 });
             }
         });
@@ -118,6 +126,23 @@ MyCatSkill.prototype.intentHandlers = {
     },
     "AMAZON.HelpIntent": function (intent, session, response) {
         doFirstTime(null, session, response);
+    },
+
+    "AMAZON.CancelIntent": function (intent, session, response) {
+        response.tell("Ok, bye!")
+    },
+    "AMAZON.NoIntent": function (intent, session, response) {
+        response.tell("Ok, bye!")
+    },
+    "AMAZON.StopIntent": function (intent, session, response) {
+        response.tell("Ok, bye!")
+    },
+    "AMAZON.YesIntent": function (intent, session, response) {
+        response.ask("What can I help you with ?", PROMPT_SPEECH)
+    },
+
+    "AMAZON.RepeatIntent": function (intent, session, response) {
+        tellOrAsk(session.attributes.speechReplay, response, session);
     }
 };
 

@@ -8,12 +8,9 @@ var launchRequest={
     "version": "1.0",
     "session": {
         "new": true,
-        "sessionId": "amzn1.echo-api.session.310858d5-af40-4673-ad60-2c4e5e24fa2c",
-        "application": {
-            "applicationId": "amzn1.echo-sdk-ams.app.f8fc1f7d-65bf-4fd6-9a1a-f9ab92eea501"
-        },
+
         "user": {
-            "userId": "amzn1.ask.account.AFP3ZWPOS2BGJR7OWJZ3DHPKMOMNWY4AY66FUR7ILBWANIHQN73QHHDH3MZLY2PHUHQU6QHJYLPNDJ5IVAJGDBLA6HTDE37VHLAGWYL5XME4I332MY4RZ57S36AQUSFP7RNGAACD4CZPGYM4VEFRC4OLYNFZZBBIWZ772SR76S5I3DXMRD3W35FAEW6VHT6XGWXPHML5FVUXTKY"
+            "userId": "TEST"
         }
     },
     "request": {
@@ -28,12 +25,8 @@ var justFed={
     "version": "1.0",
     "session": {
         "new": true,
-        "sessionId": "amzn1.echo-api.session.1dabe447-ccb5-4908-b4c6-72d46e4f4901",
-        "application": {
-            "applicationId": "amzn1.echo-sdk-ams.app.f8fc1f7d-65bf-4fd6-9a1a-f9ab92eea501"
-        },
         "user": {
-            "userId": "amzn1.ask.account.AFP3ZWPOS2BGJR7OWJZ3DHPKMOMNWY4AY66FUR7ILBWANIHQN73QHHDH3MZLY2PHUHQU6QHJYLPNDJ5IVAJGDBLA6HTDE37VHLAGWYL5XME4I332MY4RZ57S36AQUSFP7RNGAACD4CZPGYM4VEFRC4OLYNFZZBBIWZ772SR76S5I3DXMRD3W35FAEW6VHT6XGWXPHML5FVUXTKY"
+            "userId": "TEST"
         }
         ,
         "foo":"bar"
@@ -49,6 +42,32 @@ var justFed={
     }
 }
 
+var lastFed={
+    "version": "1.0",
+    "session": {
+        "new": false,
+        "application": {
+            "applicationId": "amzn1.echo-sdk-ams.app.f8fc1f7d-65bf-4fd6-9a1a-f9ab92eea501"
+        },
+        "attributes": {
+            "interactive": true,
+            "speechReplay": "I can help you take better care of your cat. You can tell me that you fed your cat, ask me if your cat has been fed, or ask me for a fun fact.. "
+        },
+        "user": {
+            "userId": "TEST"
+        }
+    },
+    "request": {
+        "type": "IntentRequest",
+        "requestId": "amzn1.echo-api.request.317a0345-8389-4b57-9159-1a11c0da91ee",
+        "timestamp": "2016-06-25T10:03:55Z",
+        "locale": "en-US",
+        "intent": {
+            "name": "LastFedIntent"
+        }
+    }
+}
+
 var context={
     succeed: function(success) {
         console.log(JSON.stringify(success));
@@ -58,4 +77,4 @@ var context={
     }
 }
 
-handler.handler(justFed, context);
+handler.handler(lastFed, context);
