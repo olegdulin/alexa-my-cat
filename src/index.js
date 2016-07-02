@@ -1,26 +1,13 @@
-/**
- * App ID for the skill
- */
 var APP_ID = "amzn1.echo-sdk-ams.app.f8fc1f7d-65bf-4fd6-9a1a-f9ab92eea501"; //replace with "amzn1.echo-sdk-ams.app.[your-unique-value-here]";
 
-/**
- * The AlexaSkill prototype and helper functions
- */
 var AlexaSkill = require('./AlexaSkill');
 
 var myCat = require('./myCat');
 
-/**
- * UnixFortune is a child of AlexaSkill.
- * To read more about inheritance in JavaScript, see the link below.
- *
- * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Introduction_to_Object-Oriented_JavaScript#Inheritance
- */
 var MyCatSkill = function () {
     AlexaSkill.call(this, APP_ID);
 };
 
-// Extend AlexaSkill
 MyCatSkill.prototype = Object.create(AlexaSkill.prototype);
 MyCatSkill.prototype.constructor = MyCatSkill;
 
@@ -57,7 +44,7 @@ const HELP_SPEECH = "I can help you take better care of your cat. " + PROMPT_SPE
 
 function tellOrAsk(speech, response, session) {
     if (session.attributes.interactive) {
-        var speechOutput = speech + ". " + ( session.new ? "" : "Is there something else I can help you with ?");
+        var speechOutput = speech + ". " + ( session.new ? "" : "Is there something I can help you with ?");
         session.attributes.speechReplay = speech;
         response.ask(speechOutput, PROMPT_SPEECH); //TODO
     }
@@ -98,6 +85,7 @@ function lastFedIntent(session, response) {
         }
     });
 }
+
 MyCatSkill.prototype.intentHandlers = {
     // register custom intent handlers
     "CatFactIntent": function (intent, session, response) {
@@ -143,6 +131,9 @@ MyCatSkill.prototype.intentHandlers = {
 
     "AMAZON.RepeatIntent": function (intent, session, response) {
         tellOrAsk(session.attributes.speechReplay, response, session);
+    },
+    "AMAZON.StartOverIntent": function (intent, session, response) {
+        doFirstTime(null, session, response);
     }
 };
 
